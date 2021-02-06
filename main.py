@@ -5,4 +5,4 @@ Created on Sat Feb  6 18:16:15 2021
 @author: User
 """
 
-print('lolo')
+print('O Daniel é gay')
