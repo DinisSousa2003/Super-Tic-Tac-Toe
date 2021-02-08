@@ -22,6 +22,9 @@ Light_Grey = (211, 211, 211)
 screen = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("TIC-TAC-TOE")
 
+#IMAGES
+Grid_img = pygame.image.load("grid.png").convert()
+
 #DISPLAY TEXT
 def text(words, center, size,  color):
     """
@@ -86,7 +89,7 @@ def play():
     while run:
         screen.fill(Red)
         
-        text("DANI GAYYYY", (250, 200), 80, Light_Grey)
+        screen.blit(Grid_img, (0, 0))
         
         #EVENTS
         for event in pygame.event.get():
