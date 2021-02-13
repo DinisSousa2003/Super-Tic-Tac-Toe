@@ -32,6 +32,15 @@ diagonal1winRect = diagonal1win.get_rect()
 diagonal2win = pygame.image.load("diagonal2.png")
 diagonal2winRect = diagonal2win.get_rect()
 
+#Importar sons
+Win_Sound = pygame.mixer.Sound("win music.mp3")
+X_Sound = pygame.mixer.Sound("'x' sound.mp3")
+O_Sound = pygame.mixer.Sound("'o' sound.mp3")
+Button_Sound = pygame.mixer.Sound("Button.wav")
+Music = pygame.mixer.music.load("Game Music.mp3")
+
+
+
 #Variáveis globais
 logicdraw = " "
 
@@ -70,6 +79,8 @@ def text(words, center, size,  color):
 
 def end():
         
+    pygame.mixer.music.stop()
+    Win_Sound.play()
 
     def check_win(xpoints,opoints):
         if opoints > xpoints:
@@ -101,6 +112,8 @@ def end():
 
         if click:
             if playagainRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                pygame.mixer.music.play(-1)
                 menu_inicial()
         click = False
         for event in pygame.event.get():
@@ -272,15 +285,6 @@ def load_atributes():
         for a in range(2):
             choose_jogo[i][a] = i*9+9*a
 
-    #Definir 81 quadrados de jogo [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    #0 1 2   9  10 11  18 19 20   
-    #3 4 5   12 13 14  21 22 23
-    #6 7 8   15 16 17  24 25 26
-    #
-    #26 27 28  35 36 37
-    #29 30 31  38 39 40
-    #32 33 34  41 42 43
-   
     gamesquares.clear()
     
     #b linha do pequeno
@@ -308,12 +312,14 @@ def x_o():
         player_corrente = o_corrente
         player_correnteRect = o_correnteRect
         logicdraw = 'o'
+        O_Sound.play()
     else:
         player = xplayer
         playerRect = xplayerRect
         player_corrente = x_corrente
         player_correnteRect = x_correnteRect
         logicdraw = 'x'
+        X_Sound.play()
     turn+=1
 
 #jogadas
@@ -435,6 +441,7 @@ def menu_inicial():
        #Check posições
         if playRect.collidepoint((mx,my)):
             if click:
+                Button_Sound.play()
                 game()
         click = False
         ##Eventos
@@ -448,6 +455,7 @@ def menu_inicial():
 
 
 if __name__ == "__main__":
+    pygame.mixer.music.play(-1) #initialize music
     menu_inicial()
-
+    
 pygame.quit()
