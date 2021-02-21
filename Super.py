@@ -1,7 +1,8 @@
 #Iniciar Pygame
-import pygame, math
+import pygame, math, time
 from pygame.cursors import sizer_y_strings
 from math import floor
+import sys
 
 pygame.init()
 
@@ -12,32 +13,47 @@ screen = pygame.display.set_mode((720,770))
 #Window Name
 pygame.display.set_caption("Super Tic Tac Toe")
 
+
 #Carregar Imagens
-x_corrente = pygame.image.load("x_atual.png")
+x_corrente = pygame.image.load("Imagens/XOandWins/x_atual.png")
 x_correnteRect = x_corrente.get_rect()
-o_corrente = pygame.image.load("o_atual.png")
+o_corrente = pygame.image.load("Imagens/XOandWins/o_atual.png")
 o_correnteRect = o_corrente.get_rect()
 player_correnteRect = x_correnteRect
 player_corrente = x_corrente
-grid_next = pygame.image.load("grid actual.png")
-grid_small = pygame.image.load("grid small.png")
-gridmain = pygame.image.load("grid main.png")
-gridmainfirst = pygame.image.load("grid main1.png")
-linhawin = pygame.image.load("linhas.png")
+grid_next = pygame.image.load("Imagens/Grids/grid actual.png")
+grid_small = pygame.image.load("Imagens/Grids/grid small.png")
+gridmain = pygame.image.load("Imagens/Grids/grid main.png")
+gridmainfirst = pygame.image.load("Imagens/Grids/grid main1.png")
+linhawin = pygame.image.load("Imagens/XOandWins/linhas.png")
 linhawinRect = linhawin.get_rect()
-colunawin = pygame.image.load("colunas.png")
+colunawin = pygame.image.load("Imagens/XOandWins/colunas.png")
 colunawinRect = colunawin.get_rect()
-diagonal1win = pygame.image.load("diagonal1.png")
+diagonal1win = pygame.image.load("Imagens/XOandWins/diagonal1.png")
 diagonal1winRect = diagonal1win.get_rect()
-diagonal2win = pygame.image.load("diagonal2.png")
+diagonal2win = pygame.image.load("Imagens/XOandWins/diagonal2.png")
 diagonal2winRect = diagonal2win.get_rect()
 
+#Imagem gif Respect
+gif_Respect = []
+for i in range(6):
+    gif_Respect.append(pygame.image.load(f"Imagens/GifMissionPassed/Mission_Passed{i+1}.png"))
+
+#Imagem gif Inicial
+
+def load_gif_inicial(gif_Inicial,i):
+    image = pygame.image.load(f"Imagens/GifInicial/{i}.jpg").convert()
+    image = pygame.transform.scale(image, (300, 321))
+    gif_Inicial.append(image)
+
+    return gif_Inicial
+
 #Importar sons
-Win_Sound = pygame.mixer.Sound("win music.mp3")
-X_Sound = pygame.mixer.Sound("'x' sound.mp3")
-O_Sound = pygame.mixer.Sound("'o' sound.mp3")
-Button_Sound = pygame.mixer.Sound("Button.wav")
-Music = pygame.mixer.music.load("Game Music.mp3")
+Win_Sound = pygame.mixer.Sound("Sons/win music.mp3")
+X_Sound = pygame.mixer.Sound("Sons/'x' sound.mp3")
+O_Sound = pygame.mixer.Sound("Sons/'o' sound.mp3")
+Button_Sound = pygame.mixer.Sound("Sons/Button.wav")
+Music = pygame.mixer.music.load("Sons/Game Music.mp3")
 
 
 
@@ -54,31 +70,37 @@ starting_move_done = True
 turn = 1
 
 ##Definir X e O
-xplayer = pygame.image.load("x.png").convert()
+xplayer = pygame.image.load("Imagens/XOandWins/x.png").convert()
 xplayerRect = xplayer.get_rect()
-oplayer = pygame.image.load("o.png").convert()
+oplayer = pygame.image.load("Imagens/XOandWins/o.png").convert()
 oplayerRect = oplayer.get_rect()
 player = xplayer
 playerRect = xplayerRect
-
-
 
 def text(words, center, size,  color):
     """
     Parameters:
     words : string
-    center : tuple (coords)
+    center : tuple (coords) or align
     size : integer
     color : name of color (from var "COLORS")
     """
     font = pygame.font.SysFont(None, size)
     text = font.render(words, True, color, None)
     textRect = text.get_rect()
-    textRect.center = center
+    if center == "topleft":
+        textRect.topleft = (10,10)
+    elif center == "bottomleft":
+        textRect.bottomleft = (10,760)
+    elif center == "bottomright":
+        textRect.bottomright = (710,760)
+    else:
+        textRect.center = center
     screen.blit(text, textRect)
+    return textRect
 
 def end():
-        
+
     pygame.mixer.music.stop()
     Win_Sound.play()
 
@@ -97,15 +119,27 @@ def end():
     check_win(xpoints,opoints)
 
     #play again button
-    font = pygame.font.SysFont(None,40)
-    textPlayagain = font.render("Play Again",True,(0,197,144))
-    playagainRect = textPlayagain.get_rect()
-    playagainRect.center = (360,450)
-    screen.blit(textPlayagain,playagainRect)
+    playagainRect = text("Play Again",(360,450),40,(0,197,144))
 
-    pygame.display.update()
+    #Quitbutton
+    quitRect = text("Quit",(360,480),40,(255,0,0))
+
+    #gif instruments (framerate and current time)
+    framerate = 0.10
+    c_t = time.time()
+    frame = 0
+
+    
     click = False
-    while True:
+    run = True
+    while run:
+
+        if time.time() > c_t:
+            frame = (frame + 1) % 6
+            screen.blit(gif_Respect[frame], (115, 55))
+            #obter imagem
+            pygame.display.update()
+            c_t += framerate
 
         #Check mouse pos
         mx, my = pygame.mouse.get_pos()
@@ -113,15 +147,24 @@ def end():
         if click:
             if playagainRect.collidepoint((mx,my)):
                 Button_Sound.play()
-                pygame.mixer.music.play(-1)
                 menu_inicial()
+            if quitRect.collipoint((mx,my)):
+                Button_Sound.play()
+                run = False
+                pygame.quit()
+                sys.exit()
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                run = False
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+    
+        pygame.display.update()
+
 
 #jogo 0:  0- 9
 #jogo 1:  9-18
@@ -214,13 +257,14 @@ def pontuacao():
     xpontuacao = font.render("X - " + str(xpoints), True, (255,255,255), None)
     xpontuacaoRect = xpontuacao.get_rect()
     xpontuacaoRect.center = (180,745)
+    
     pygame.draw.rect(screen, (0,0,0), xpontuacaoRect)
     screen.blit(xpontuacao, xpontuacaoRect)
 
     opontuacao = font.render("O - " + str(opoints), True, (255,255,255), None)
     opontuacaoRect = opontuacao.get_rect()
     opontuacaoRect.center = (540,745)
-    #opontuacaoRect.fill((0,0,0))
+
     pygame.draw.rect(screen, (0,0,0), opontuacaoRect)
     screen.blit(opontuacao, opontuacaoRect)
     return (xpoints, opoints)
@@ -350,6 +394,8 @@ def play_move(mx,my,i):
 
         #conta pontos
         pontuacao()
+        #obter imagens
+        pygame.display.update()
         
 
 
@@ -373,33 +419,39 @@ def grid_clean():
     game, linha, coluna = transform(jogada)
     screen.blit(grid_small,grid_games[full(line_and_column_to_pos(linha,coluna))])
 
-def game():
+def game(start):
     global turn,jogada
-    jogada=0
-
-    #resetar squares e listas, resetar mapa logico etc.
-    load_atributes()
-
     screen.fill((0,0,0))
+    if start:
+        jogada=0
 
-    #Mapa do jogo grid main
-    screen.blit(gridmainfirst, (10, 10))
+        #resetar squares e listas, resetar mapa logico etc.
+        load_atributes()
 
-    #Desenhar as pequenas grids e guarda-las numa lista
-    initial_pos = (16, 16)
-    increment = 233 +2 #size of small grid + big grid thickness
-    for column in range(3):
-        for line in range(3):
-            screen.blit(grid_small, (initial_pos[0] + increment*line, initial_pos[1] + increment*column))
-            grid_games.append((initial_pos[0] + increment*line, initial_pos[1] + increment*column))
-    
-    pontuacao()
+        #Mapa do jogo grid main
+        screen.blit(gridmainfirst, (10, 10))
+
+        #Desenhar as pequenas grids e guarda-las numa lista
+        initial_pos = (16, 16)
+        increment = 233 +2 #size of small grid + big grid thickness
+        for column in range(3):
+            for line in range(3):
+                screen.blit(grid_small, (initial_pos[0] + increment*line, initial_pos[1] + increment*column))
+                grid_games.append((initial_pos[0] + increment*line, initial_pos[1] + increment*column))
+
+        pontuacao()
+    else:
+        gamestate = pygame.image.load("Imagens/gamestate.jpg")
+        screen.blit(gamestate,(0,0))
+    exitRect = text("EXIT","bottomleft",45,(255,0,0))
+    helpRect = text("HELP","bottomright",45,(255,0,0))
+    #obter imagem
     pygame.display.update()
 
-    
     #detetar o click
     click = False
-    while True:
+    run = True
+    while run:
         #obter mouse pos        
         mx, my = pygame.mouse.get_pos()
         
@@ -407,55 +459,210 @@ def game():
         if click:
             if first_move(mx,my): #1º move? devolve False se sim e True se nao
                 moves(mx,my)
+            if helpRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                pygame.image.save(screen,"Imagens/gamestate.jpg")
+                instruction_menu(True)
+            if exitRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                menu_inicial()
 
         pygame.display.update()
         click = False
         #eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                run = False
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
 
+def instructions(local,comefromgame):
+    prev = False
+    nxt = True
+    screen.fill((0,0,0))
+    a = 0
+    if local == 0:
+        local = "Instruçoes/0Game and Logic/0_"
+        max_a = 3
+    elif local == 1:
+        local = "Instruçoes/1Connection and Moves/1_"
+        max_a = 4
+    elif local ==2:
+        local = "Instruçoes/2Points/2_"
+        max_a = 1
+    run1 = True
+    while run1:
+        page = pygame.image.load(f"{local}{a}.png").convert()
+        screen.blit(page,(0,0))
+        go_backRect = text("Return","topleft",30,(255,0,0))
+        pygame.draw.rect(screen,(0,0,0),go_backRect)
+        go_backRect = text("Return","topleft",30,(255,0,0))
+        if a != 0:
+            prev = True
+            previousRect = text("<-- Previous","bottomleft",30,(255,255,255))
+        if a < max_a:
+            nextRect = text("Next -->","bottomright",30,(255,255,255))
+        else:
+            nxt = False
+        pygame.display.update()
+        run = True
+        click = False
+        while run:
+            mx,my = pygame.mouse.get_pos()
+            if click:
+                if go_backRect.collidepoint((mx,my)):
+                    Button_Sound.play()
+                    if comefromgame:
+                        instruction_menu(True)
+                    else:
+                        instruction_menu(False)
+                if prev and previousRect.collidepoint((mx,my)):
+                    Button_Sound.play()
+                    a -= 1
+                    run = False
+                if nxt and nextRect.collidepoint((mx,my)):
+                    Button_Sound.play()
+                    a += 1
+                    run = False
+            click = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run1 = False
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
 
+def instruction_menu(comefromgame):
+    screen.fill((0,0,0))
+    game_and_logicRect = text("Game Map and Logic",(360,190),40,(255,255,255))
+    connection_and_movesRect = text("Connection and Moves",(360,380),40,(255,255,255))
+    pointsRect = text("Points",(360,570),40,(255,255,255))
+    go_backRect = text("Return","topleft",30,(255,0,0))
+    pygame.display.update()
+    click = False
+    run = True
+    while run:
+        #get mouse pos
+        mx,my = pygame.mouse.get_pos()
+        #butoes
+        if click:
+            if go_backRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                if comefromgame:
+                    game(False)
+                else:
+                    menu_inicial()
+            if game_and_logicRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                instructions(0,comefromgame)
+            if connection_and_movesRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                instructions(1,comefromgame)
+            if pointsRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                instructions(2,comefromgame)
+
+        click = False
+        #eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run =False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
 def menu_inicial():
+    first_cycle=True
+    gif_Inicial = []
+    #gif instruments (framerate and current time)
+    framerate_gif_Inicial = 0.06
+    c_t_gif_Inicial = time.time()
+    frame_gif_Inicial = 0
+
+    #x and o animation
+    phrase_animation = "X"
+    coords_animation = (160, 478)
+
+    framerate_animation = 0.15
+    c_t_animation = time.time()
+    frame_animation = 0
+
+    pygame.mixer.music.play(-1) #initialize music
     click = False
     #Draw
     screen.fill((0,0,0))
-    text("Super Tic Tac Toe",(360,385),70,(250,250,250))
+    text("Super Tic Tac Toe",(360,450),70,(250,250,250))
+    
 
     #PLAY BUTTON
-    font = pygame.font.SysFont(None,40)
-    textPlay = font.render("Play",True,(0,197,144))
-    playRect = textPlay.get_rect()
-    playRect.center = (360,450)
-    screen.blit(textPlay,playRect)
-        
+    playRect = text("Play",(360,520),40,(0,197,144))
+
+    #instructions
+    instructionRect = text("Instructions",(360,560),40,(255,0,0))
+
+    #obter imagem
+    pygame.display.update()
+    
+    run = True
     #Loop
-    while True:
+    while run:
         #check mouse positions
         mx, my = pygame.mouse.get_pos()
-       
+
+        #x_and_o
+        font = pygame.font.SysFont(None, 18)
+        text_phrase_animation = font.render(phrase_animation, True, (180, 180, 180), None)
+        screen.blit(text_phrase_animation, coords_animation)
+        
+        if time.time() > c_t_animation:
+            phrase_animation += "   O" if phrase_animation[-1] == "X" else "   X"
+            if len(phrase_animation) > 90:
+                pygame.draw.rect(screen,(0, 0, 0),(160,478,720,25))
+                phrase_animation = "X"
+            c_t_animation += framerate_animation
+            
+        #gif
+        if time.time() > c_t_gif_Inicial:
+            frame_gif_Inicial = (frame_gif_Inicial) % 93
+            if frame_gif_Inicial != 92 and first_cycle:
+                gif_Inicial = load_gif_inicial(gif_Inicial,frame_gif_Inicial)
+            else:
+                if first_cycle:
+                    gif_Inicial = load_gif_inicial(gif_Inicial,frame_gif_Inicial)
+                first_cycle=False
+            screen.blit(gif_Inicial[frame_gif_Inicial], (200, 55))
+            frame_gif_Inicial += 1
+            #obter imagem
+            c_t_gif_Inicial += framerate_gif_Inicial
+            pygame.display.update()
        #Check posições
-        if playRect.collidepoint((mx,my)):
-            if click:
+        if click:
+            if playRect.collidepoint((mx,my)):
                 Button_Sound.play()
-                game()
+                gif_Inicial.clear()
+                game(True)
+            if instructionRect.collidepoint((mx,my)):
+                Button_Sound.play()
+                gif_Inicial.clear()
+                instruction_menu(False)
         click = False
         ##Eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                run = False
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        pygame.display.update()
 
 
 if __name__ == "__main__":
-    pygame.mixer.music.play(-1) #initialize music
     menu_inicial()
-    
-pygame.quit()
