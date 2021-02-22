@@ -1,6 +1,6 @@
 # Super-Tic-Tac-Toe
 
-Developed by Daniel Lopes and Dinis Sousa, two fisrt year engeeniring students. (We were bored during the gap between semesters)
+Developed by Daniel Lopes and Dinis Sousa, two first year engeeniring students. (We were bored during the gap between semesters)
 
 ### Packages
 Pygame
