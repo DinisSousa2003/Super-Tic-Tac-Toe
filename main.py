@@ -1,6 +1,6 @@
 
 #Iniciar Pygame
-import pygame
+import pygame, sys
 pygame.init()
 
 #Window
@@ -116,11 +116,13 @@ def menu_final():
                 menu_inicial()
             if quitRect.collidepoint((mx,my)):
                 pygame.quit()
+                sys.exit()
         click = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
@@ -303,6 +305,7 @@ def game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
@@ -333,6 +336,7 @@ def play_button():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
@@ -352,3 +356,4 @@ if __name__ == "__main__":
 
 
 pygame.quit()
+sys.exit()
